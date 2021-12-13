@@ -1,12 +1,28 @@
 #include <Arduino.h>
+#include <PubSubClient.h>
+
+#include "motor.h"
+#include "uart.h"
 
 void setup() {
   
-  Serial.begin(9600);
+  uart::init();
+
+  motor::init();
+  //motor::set();
 
 }
 
 void loop() {
-  Serial.println("Hello");
-  delay(1000);
+  
+  uint8_t in = uart::read();
+
+  if(in == uart::STOP) {
+    motor::reset();
+  }
+  else if(in == uart::RESUME) {
+    motor::set();
+  }
+
+  delay(100);
 }
