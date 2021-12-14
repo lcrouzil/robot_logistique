@@ -18,7 +18,9 @@ Client::Client(QWidget *parent)
 }
 
 
-
+/**destructeur
+ * @brief Client::~Client
+ */
 Client::~Client()
 {
     delete ui;
@@ -31,20 +33,82 @@ Client::~Client()
 void Client::jsonMessageOrder()
 {
     QJsonObject envoie;
+    QString topic;
+    topic = "field/ui/<id>/ordre";
+    quint8 qos;
+    qos=2;
+    bool retain;
+    retain = false;
+
     envoie.insert("color",ui->le_couleur->text());      //couleur
     envoie.insert("loadingArea",ui->sb_zdc->value());   //zone de chargement
-    envoie.insert("depositArea",ui->sb_zdd->value());   //zone de dépot
-    envoie.insert("robotId",ui->sb_idRobot->value());   // id_Robot
+    envoie.insert("depositArea",1);                     //zone de dépot fixé
+    envoie.insert("robotId","ROBOT5");                  // id_Robot
 
-    this->emissionJson(envoie);
+    this->emissionJson(envoie,topic,qos,retain);
 
 }
 
+/**chemin a effectuer
+ * @brief Client::jsonMessagePath
+ */
+void Client::jsonMessagePath()
+{
+    QJsonObject envoie;
+    QString topic;
+    topic = "field/robot/<id_robot>/path";
+    quint8 qos;
+    qos=2;
+    bool retain;
+    retain = false;
+
+    //payload: {“id”: <id_etape>, “direction”: <char_direction(L/F/R)>}
+    envoie.insert("id","id_etape");
+    envoie.insert("direction","char_dir");
+
+    this->emissionJson(envoie,topic,qos,retain);
+
+}
+
+/**Envoi messageCam pour lancer le scan
+ * @brief Client::jsonMessageCam
+ */
+void Client::jsonMessageCam()
+{
+    QJsonObject envoie;
+    QString topic;
+    topic = "field/camera/5/scan";
+    quint8 qos;
+    qos=1;
+    bool retain;
+    retain = true;
+
+    envoie.insert("robot","ROBOT5");
+    this->emissionJson(envoie,topic,qos,retain);
+}
+/**Interface indique la couleur dans la zone determinee
+ * @brief Client::jsonMessageColor
+ */
+void Client::jsonMessageAreaColor()
+{
+    QJsonObject envoie;
+    QString topic;
+    int zoneDeChargement = ui->sb_zdc->value();
+    QString zdc = QString::number(zoneDeChargement);
+    topic = "field/loading_area/"+ zdc +"/color";
+    quint8 qos;
+    qos=0;
+    bool retain;
+    retain = true;
+    envoie.insert("color","color");
+    this->emissionJson(envoie,topic,qos,retain);
+
+}
 /**Envoie du JSon
  * @brief Client::emissionJson
  * @param envoie
  */
-void Client::emissionJson(QJsonObject &envoie)
+void Client::emissionJson(QJsonObject &envoie, QString &topic, quint8 &qos, bool &retain)
 {
 
     //transformation de envoie en docJSON
@@ -57,8 +121,11 @@ void Client::emissionJson(QJsonObject &envoie)
     QByteArray qbaEnvoie=strEnvoie.toUtf8();
 
     //envoie du message par la méthode publish
-    m_client->publish(ui->le_sub->text(), qbaEnvoie,2 ,false);
+    m_client->publish(topic, qbaEnvoie, qos, retain);
+
 }
+
+
 
 /**bouton de co/deco avec modification du bouton
  *

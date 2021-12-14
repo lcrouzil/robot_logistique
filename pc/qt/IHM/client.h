@@ -22,11 +22,11 @@ public:
     Client(QWidget *parent = nullptr);
     ~Client();
 
+    void emissionJson(QJsonObject &, QString &,quint8 &, bool &);
     void jsonMessageOrder();
-    void emissionJson(QJsonObject &);
-    //QMqttTopicName &topicOrder;
-
-
+    void jsonMessagePath();
+    void jsonMessageCam();
+    void jsonMessageAreaColor();
 
 
 private:
