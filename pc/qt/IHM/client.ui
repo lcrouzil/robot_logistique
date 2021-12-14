@@ -34,7 +34,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="le_host"/>
+        <widget class="QLineEdit" name="le_host">
+         <property name="text">
+          <string>mqtt-milles.imerir.org</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_6">
@@ -47,6 +51,9 @@
         <widget class="QSpinBox" name="sb_port">
          <property name="maximum">
           <number>99999999</number>
+         </property>
+         <property name="value">
+          <number>1884</number>
          </property>
         </widget>
        </item>
@@ -62,14 +69,32 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>subscription</string>
+          <string>NoA</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="le_sub"/>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>NoA</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>NoA</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>NoA</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -81,6 +106,9 @@
           <string>couleur</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="le_couleur"/>
        </item>
        <item>
         <spacer name="horizontalSpacer">
@@ -95,9 +123,6 @@
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="QLineEdit" name="le_couleur"/>
-       </item>
       </layout>
      </item>
      <item>
@@ -108,6 +133,9 @@
           <string>zone de chargement</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="sb_zdc"/>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
@@ -122,15 +150,19 @@
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="QSpinBox" name="sb_zdc"/>
-       </item>
       </layout>
      </item>
      <item>
       <widget class="QPushButton" name="pb_order">
        <property name="text">
         <string>Envoyer ordre</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>PushButton</string>
        </property>
       </widget>
      </item>
