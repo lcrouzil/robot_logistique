@@ -74,6 +74,14 @@ namespace uart {
         return "";
     }
 
+    /**
+     * @brief Envoie toutes les données, reçues sur Rx, sur Tx
+     * 
+     */
+    void echo() {
+        Serial.print(Serial.readString());
+    }
+
 }
 
 #endif
