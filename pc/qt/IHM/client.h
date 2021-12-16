@@ -1,6 +1,10 @@
  #ifndef CLIENT_H
 #define CLIENT_H
 
+//*******************************************************************************************************************
+//          INCLUDE                                                                                              *
+//*******************************************************************************************************************
+
 #include <QMainWindow>
 #include <QDebug>
 #include<QJsonObject>
@@ -43,8 +47,10 @@ private:
 public slots:
     void bp_co_clicked();
 
-    void scan();
+    //void on_simuSTM_clicked();
 
+    void scan();
+    void checketagere();
     void setsub();
     void jsonMessageOrder();
     void messReceivedCam(QMqttMessage);
@@ -55,6 +61,11 @@ public slots:
     void messReceiveEtagere3(QMqttMessage);
     void messReceiveEtagere4(QMqttMessage);
     void updatestatusetagere();
+    void setdiscon();
+    void dissub();
+    void checkexspin(int);
+    void checkexcombo(int);
+
 
 
 
