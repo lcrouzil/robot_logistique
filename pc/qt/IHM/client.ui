@@ -34,7 +34,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="le_host"/>
+        <widget class="QLineEdit" name="le_host">
+         <property name="text">
+          <string>mqtt-milles.imerir.org</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_6">
@@ -47,6 +51,9 @@
         <widget class="QSpinBox" name="sb_port">
          <property name="maximum">
           <number>99999999</number>
+         </property>
+         <property name="value">
+          <number>1884</number>
          </property>
         </widget>
        </item>

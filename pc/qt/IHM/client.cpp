@@ -8,10 +8,6 @@ Client::Client(QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->m_client = new QMqttClient(this); //client
-    this->m_client->setHostname(ui->le_host->text()); //hote
-    this->m_client->setPort(ui->sb_port->value()); //port
-    m_client->connectToHost();
 
 
     connect(this->ui->pb_co, SIGNAL(clicked()),this, SLOT(bp_co_clicked()));
@@ -135,6 +131,7 @@ void Client::bp_co_clicked()
 {
     this->m_client->setHostname(ui->le_host->text()); //hote
     this->m_client->setPort(ui->sb_port->value()); //port
+
     m_client->connectToHost();
     /*
     //verifie etat du client
