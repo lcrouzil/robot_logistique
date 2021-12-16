@@ -30,7 +30,7 @@ void state_machine_run() {
 	case S_MOVE_STOP: {
 
 		if(state != stateOld) {
-			// TODO Moteur robot arrêtés
+			motors_stop();
 			stateOld = state;
 		}
 
@@ -49,17 +49,15 @@ void state_machine_run() {
 	case S_MOVE_FORWARD: {
 
 		if(state != stateOld) {
-			// TODO Moteur robot en avant
+			motors_moveForward();
 			stateOld = state;
 		}
 
-		if(flags.sensorLeft == 0b10) { // flag levé & piste noir
-			flags.fSensorLeft = 0;
+		if(flags.vSensorLeft == 0) { // flag levé & piste noir
 			state = S_MOVE_LEFT;
 			break;
 		}
-		if(flags.sensorRight == 0b10) { // flag levé & piste noir
-			flags.fSensorRight = 0;
+		if(flags.vSensorRight == 0) { // flag levé & piste noir
 			state = S_MOVE_RIGHT;
 			break;
 		}
@@ -73,17 +71,15 @@ void state_machine_run() {
 	case S_MOVE_RIGHT: {
 
 		if(state != stateOld) {
-			// TODO Moteur robot vers la droite
+			motors_moveRight();
 			stateOld = state;
 		}
 
-		if(flags.sensorLeft == 0b10) {  // flag levé & piste noir
-			flags.fSensorLeft = 0;
+		if(flags.vSensorLeft == 0) {  // flag levé & piste noir
 			state = S_INTERSECTION;
 			break;
 		}
-		if(flags.sensorRight == 0b11) {  // flag levé & piste blanche
-			flags.fSensorRight = 0;
+		if(flags.vSensorRight == 1) {  // flag levé & piste blanche
 			state = S_MOVE_FORWARD;
 			break;
 		}
@@ -97,17 +93,15 @@ void state_machine_run() {
 	case S_MOVE_LEFT: {
 
 		if(state != stateOld) {
-			//TODO Moteur robot vers la gauche
+			motors_moveLeft();
 			stateOld = state;
 		}
 
-		if(flags.sensorLeft == 0b11) {  // flag levé & piste blanche
-			flags.fSensorLeft = 0;
+		if(flags.vSensorLeft == 1) {  // flag levé & piste blanche
 			state = S_MOVE_FORWARD;
 			break;
 		}
-		if(flags.sensorRight == 0b10) {  // flag levé & piste noir
-			flags.fSensorRight = 0;
+		if(flags.vSensorRight == 0) {  // flag levé & piste noir
 			state = S_INTERSECTION;
 			break;
 		}
@@ -121,12 +115,14 @@ void state_machine_run() {
 	case S_INTERSECTION: {
 
 		if(state != stateOld) {
-			//TODO Moteur robot vers la gauche
+			motors_stop();
 			stateOld = state;
 		}
 
 		if(flags.fButton) { // flag levé
-			state = S_MOVE_FORWARD;
+			flags.fButton = 0;
+			state = S_MOVE_LEFT;
+			break;
 		}
 
 		break;
@@ -135,7 +131,7 @@ void state_machine_run() {
 
 	default: {
 
-		state = S_MOVE_FORWARD;
+		state = S_INTERSECTION;
 
 		break;
 	}

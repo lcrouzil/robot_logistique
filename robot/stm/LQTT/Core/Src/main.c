@@ -24,15 +24,12 @@
 /* USER CODE BEGIN Includes */
 #include "motors.h"
 #include "sensor.h"
+#include "state_machine.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define STATE_DEVANT	1
-#define STATE_GAUCHE	2
-#define STATE_DROIT		3
-#define STATE_OBSTACLE	4
-#define STATE_INTERSECTION	5
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -108,7 +105,8 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-   sensors_init(&htim7,&htim6);
+  motors_init(&htim3, &htim16);
+  sensors_init(&htim7,&htim6);
 
   /* USER CODE END 2 */
 
@@ -120,7 +118,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  sensors_ultason();
+
+	  state_machine_run();
+
   }
   /* USER CODE END 3 */
 }

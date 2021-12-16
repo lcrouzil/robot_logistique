@@ -29,7 +29,7 @@ void motors_init(TIM_HandleTypeDef* htimG,TIM_HandleTypeDef* htimD)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, SET);
 }
 
-void motors_goforward()
+void motors_moveForward()
 {
 
 	 HAL_TIM_PWM_Start(motors_htimG, TIM_CHANNEL_3);
@@ -37,14 +37,14 @@ void motors_goforward()
 	 HAL_TIM_PWM_Start(motors_htimD, TIM_CHANNEL_1);
 }
 
-void motors_goleft()
+void motors_moveLeft()
 {
 	HAL_TIM_PWM_Stop(motors_htimG, TIM_CHANNEL_3);
 
 	HAL_TIM_PWM_Start(motors_htimD, TIM_CHANNEL_1);
 }
 
-void motors_goright()
+void motors_moveRight()
 {
 	HAL_TIM_PWM_Start(motors_htimG, TIM_CHANNEL_3);
 

@@ -54,19 +54,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if(GPIO_Pin == GPIO_PIN_12) // Capteur droit
 	{
 		flags.fSensorRight = 1;
-		flags.vSensorRight = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
+		flags.vSensorRight = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
 	}
 
 	if(GPIO_Pin == GPIO_PIN_14) // Capteur gauche
 	{
 		flags.fSensorLeft = 1;
-		flags.vSensorLeft = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
+		flags.vSensorLeft = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
 	}
 
 	if(GPIO_Pin == GPIO_PIN_15) // Capteur balle
 	{
 		flags.fSensorBall = 1;
-		flags.vSensorBall = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15);
+		flags.vSensorBall = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15);
 	}
 
 	if(GPIO_Pin == GPIO_PIN_1) // Sonar echo
