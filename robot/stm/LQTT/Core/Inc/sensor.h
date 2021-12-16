@@ -69,21 +69,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		flags.vSensorBall = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15);
 	}
 
-	if(GPIO_Pin == GPIO_PIN_1) // Sonar echo
-	{
-		if ( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1))
-		{
-			HAL_TIM_Base_Start(ultrason_htim_echo);
-			value_echo = __HAL_TIM_GET_COUNTER(ultrason_htim_echo);
-		}
-		else
-		{
-			value_echo = __HAL_TIM_GET_COUNTER(ultrason_htim_echo) -value_echo;
-			HAL_TIM_Base_Stop(ultrason_htim_echo);
-			flag_timer_sonar = 1 ;
-		}
-	}
-
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
