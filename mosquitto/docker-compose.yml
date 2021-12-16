@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  broker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mosquitto_broker_auth
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - /mosquitto/data
+      - ./log:/mosquitto/log
+
