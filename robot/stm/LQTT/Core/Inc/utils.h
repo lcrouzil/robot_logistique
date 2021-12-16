@@ -12,6 +12,7 @@
 #include "string.h"
 #include "direction.h"
 #include "flags.h"
+#include "uart.h"
 
 /**
  * Renvoie la taille du tableau de caractère en sortie
@@ -84,6 +85,22 @@ void utils_setDirectionsFlag(Direction_t dir) {
 	default:
 		break;
 	}
+
+}
+
+void utils_readAndSaveDir() {
+
+
+	  char message_in[256] = {0};
+	  uint16_t size = uart_read(message_in);
+
+	  if(size) {
+
+		  char message_message[256] = {0};
+		  uint16_t size2 = utils_getMessage(message_in, message_message, size);
+		  Direction_t dir = utils_parseJson(message_message, size2);
+		  direction_add(dir);
+	  }
 
 }
 
