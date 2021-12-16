@@ -24,6 +24,8 @@
 /* USER CODE BEGIN Includes */
 #include "motors.h"
 #include "flags.h"
+#include "utils.h"
+#include "uart.h"
 #include "state_machine.h"
 /* USER CODE END Includes */
 
@@ -34,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SPEED 300
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -113,9 +116,12 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  uart_init(&huart1);
   motors_init(&htim3, &htim16);
+
   HAL_TIM_Base_Init(&htim7);
   HAL_TIM_Base_Init(&htim6);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -151,7 +157,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	// state_machine_run();
+
+	  utils_readAndSaveDir();
+
+	  state_machine_run();
   }
   /* USER CODE END 3 */
 }
@@ -249,7 +258,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 400;
+  sConfigOC.Pulse = SPEED;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
@@ -373,7 +382,7 @@ static void MX_TIM16_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 400;
+  sConfigOC.Pulse = SPEED;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
