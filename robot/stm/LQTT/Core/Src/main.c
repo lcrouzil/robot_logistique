@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motors.h"
+#include "sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,27 +50,9 @@ TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim16;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
-
-//variable tmp
-int tmp1 = 1; //empêche de relancer le timer7
-
-//varible sonar
-uint8_t flag_timer = 0;
-double value_distance = 0;
-uint16_t value_fin = 0;
-
-//variable PM
-uint8_t flag_droite = 0;
-uint8_t flag_gauche = 0;
-uint8_t flag_present = 0;
-
-//variable moteur
-uint8_t valeur_sens_motor_gauche = 0;
-uint8_t valeur_sens_motor_droit = 0;
-
-//variable pwm droit
-//variable pwm gauche
 
 /* USER CODE END PV */
 
@@ -80,6 +63,7 @@ static void MX_TIM7_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM16_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -121,22 +105,11 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM3_Init();
   MX_TIM16_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-   HAL_TIM_Base_Init(&htim7);
-   HAL_TIM_Base_Init(&htim6);
+   sensors_init(&htim7,&htim6);
 
-   //motors_init(&htim3);
-
-	//HAL_TIM_PWM_Init(&htim3);
-	//HAL_TIM_PWM_Init(&htim16);
-	//HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
-	//HAL_TIM_PWM_Start(&htim16, TIM_CHANNEL_1);
-	//motors_init(&htim3,&htim16);
-
-
-	  uint8_t etat = 0;
-	  uint8_t old = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -144,127 +117,10 @@ int main(void)
    // TODO code here
   while (1)
   {
-
-
-
-
-
-	  switch (etat) {
-		case STATE_DEVANT:
-		{
-			if(old != etat)
-			{
-				motors_goforward();
-				old = etat;
-			}
-
-			if(flag_droite) {
-				flag_droite = 0;
-				etat = STATE_DROIT;
-			}
-			if(flag_gauche) {
-				flag_gauche = 0;
-				etat = STATE_GAUCHE;
-			}
-		}
-		break;
-
-		case STATE_DROIT:
-		{
-			if(old != etat)
-			{
-				motors_goright();
-				old = etat;
-			}
-
-			if(flag_droite) {
-				flag_droite = 0;
-				etat = STATE_DEVANT;
-			}
-			if(flag_gauche) {
-				flag_gauche = 0;
-				etat = STATE_INTERSECTION;
-			}
-		}
-		break;
-
-		case STATE_GAUCHE:
-		{
-
-			if(old != etat)
-			{
-				motors_goleft();
-				old = etat;
-			}
-
-			if(flag_gauche) {
-				flag_gauche = 0;
-				etat = STATE_DEVANT;
-			}
-			if(flag_droite) {
-				flag_droite = 0;
-				etat = STATE_INTERSECTION;
-			}
-		}
-		break;
-
-		case STATE_INTERSECTION:
-		{
-			if(old != etat)
-			{
-				motors_stop();
-				old = etat;
-			}
-
-			if(flag_droite) {
-				flag_droite = 0;
-				etat = STATE_DROIT;
-			}
-			if(flag_gauche) {
-				flag_gauche = 0;
-				etat = STATE_GAUCHE;
-			}
-		}
-		break;
-		case STATE_OBSTACLE:
-		{
-			etat = 0;
-		}
-		break;
-	default: {
-		motors_init(&htim3, &htim16);
-		etat = STATE_DEVANT;
-	}
-		break;
-	}
-
-/*	   motors_goforward();
-	   HAL_Delay(1000);
-	   motors_goleft();
-	   HAL_Delay(1000);
-	   motors_goright();
-	   HAL_Delay(1000);
-	   motors_stop();
-	   HAL_Delay(1000);
-
-*/
-	  if(tmp1)
-	  {
-		 HAL_TIM_Base_Start_IT(&htim7);
-		 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-		 tmp1 = 0;
-	  }
-	  if (flag_timer)
-	  {
-	  //Calcul apres reception signal :
-	  	value_distance = value_fin * 0.17;  //distance en mm
-	  	flag_timer = 0;
-	  	tmp1 = 1;
-	  	// TODO levé flag obstacle
-	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  sensors_ultason();
   }
   /* USER CODE END 3 */
 }
@@ -515,6 +371,41 @@ static void MX_TIM16_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -531,6 +422,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_5|GPIO_PIN_11|GPIO_PIN_12, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PA0 PA5 PA11 PA12 */
   GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_5|GPIO_PIN_11|GPIO_PIN_12;
@@ -553,8 +450,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB13 PB14 PB15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+  /*Configure GPIO pins : PB12 PB14 PB15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -577,74 +474,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-
-	if(GPIO_Pin == GPIO_PIN_13)
-	{
-		if ( HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13))
-		{
-			flag_droite = 1;
-		}
-		else
-		{
-			flag_droite = 0;
-		}
-	}
-
-	if(GPIO_Pin == GPIO_PIN_14)
-	{
-		if ( HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14))
-		{
-			flag_gauche = 1;
-		}
-		else
-		{
-			flag_gauche = 0;
-		}
-	}
-
-	if(GPIO_Pin == GPIO_PIN_15)
-	{
-		if ( HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15))
-		{
-			flag_present = 1;
-		}
-		else
-		{
-			flag_present = 0;
-		}
-	}
-
-	if(GPIO_Pin == GPIO_PIN_1)
-	{
-		if ( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1))
-		{
-			HAL_TIM_Base_Start(&htim6);
-			value_fin = __HAL_TIM_GET_COUNTER(&htim6);
-		}
-		else
-		{
-			value_fin = __HAL_TIM_GET_COUNTER(&htim6) -value_fin;
-			HAL_TIM_Base_Stop(&htim6);
-			flag_timer = 1 ;
-		}
-	}
-
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	HAL_TIM_Base_Stop_IT(&htim7);
-	HAL_TIM_Base_Init(&htim7);
-
-}
-
-
 
 /* USER CODE END 4 */
 
