@@ -32,13 +32,7 @@ public:
 
     int jsonMessagePath(int);
     void jsonMessageCam();
-    void jsonMessageAreaColor();
-
-
-    //void jsonMessageReception();
-   // void setSubCam(QMqttClient);
-
-
+    //void jsonMessageAreaColor();
 
 private:
     Ui::Client *ui;
@@ -46,8 +40,6 @@ private:
     QMqttSubscription * subscription;
 public slots:
     void bp_co_clicked();
-
-    //void on_simuSTM_clicked();
 
     void scan();
     void checketagere();
@@ -65,10 +57,6 @@ public slots:
     void dissub();
     void checkexspin(int);
     void checkexcombo(int);
-
-
-
-
 
 
 };
