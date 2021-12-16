@@ -329,7 +329,7 @@ p, li { white-space: pre-wrap; }
 font: 700 italic 9pt &quot;Segoe UI&quot;;</string>
         </property>
         <property name="text">
-         <string>&lt;a href=&quot;http://copyright.be&quot; target=&quot;_blank&quot;&gt;Copyright © 2021 Amazën - Tous droits réservés&lt;/a&gt;</string>
+         <string>&lt;a href=&quot;https://www.youtube.com/watch?v=G1IbRujko-A&amp;ab_channel=10Hours&quot; target=&quot;https://www.youtube.com/watch?v=G1IbRujko-A&amp;ab_channel=10Hours&quot;&gt;Copyright © 2021 Amazën - Tous droits réservés&lt;/a&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
