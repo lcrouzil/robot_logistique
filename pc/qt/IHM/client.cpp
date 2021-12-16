@@ -88,28 +88,31 @@ Client::Client(QWidget *parent)
     id=12;
     //mise en place des deplacement a effectuer en fonctions de l'id
     pazr.insert(0,"L");
-    pazr.insert(1,"F");
-    pazr.insert(2,"F");
-    pazr.insert(3,"F");
-    pazr.insert(4,"F");
+    pazr.insert(1,"L");
+    pazr.insert(2,"R");
+    pazr.insert(3,"R");
+    pazr.insert(4,"R");
     pazc1.insert(5,"L");
-    pazc1.insert(6,"F");
-    pazc1.insert(7,"F");
-    pazc1.insert(8,"F");
+    pazc1.insert(6,"L");
+    pazc1.insert(7,"L");
+    pazc1.insert(8,"L");
     pazc2.insert(5,"L");
     pazc2.insert(6,"R");
-    pazc2.insert(7,"F");
-    pazc2.insert(8,"F");
+    pazc2.insert(7,"L");
+    pazc2.insert(8,"L");
     pazc3.insert(6,"R");
-    pazrd.insert(9,"F");
-    pazrd.insert(10,"F");
-    pazrd.insert(11,"F");
-    pazrd.insert(12,"F");
+    pazrd.insert(9,"L");
+    pazrd.insert(10,"L");
+    pazrd.insert(11,"L");
+    pazrd.insert(12,"L");
     pazrcr.insert(9,"R");
     pazrcr.insert(1,"R");
 
     //griser le bouton envoie ordre
     ui->pb_order->setEnabled(false);
+
+    //lien
+    ui->label_7->setOpenExternalLinks(true);
 
     //initialise la co
     connect(this->ui->pb_co, SIGNAL(clicked()),this, SLOT(bp_co_clicked()));
@@ -133,10 +136,6 @@ Client::Client(QWidget *parent)
 
     //recuperation des infos sur les etageres
     updatestatusetagere();
-
-
-
-
 
 }
 
@@ -203,15 +202,14 @@ int Client::jsonMessagePath(int id)
     qDebug() << "valeur de receptz pour JSONMessagePath "<< receptz;
     int id2=id;
 
-    //preparatioin de la trame
+    //preparation de la trame
     QJsonObject envoie;
     QString topic;
     topic = "field/robot/ROBOT5/path";
     quint8 qos;
     qos=2;
     bool retain;
-    retain = false;
-
+    retain = true; //============================================================false normalement
 
     if (id<8) //cas ou la boucle du terrain n'est pas fini
     {
