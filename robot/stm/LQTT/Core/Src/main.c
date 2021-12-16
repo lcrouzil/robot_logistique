@@ -23,7 +23,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motors.h"
-#include "sensor.h"
+#include "flags.h"
+#include "utils.h"
+#include "uart.h"
 #include "state_machine.h"
 /* USER CODE END Includes */
 
@@ -34,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SPEED 300
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,6 +53,14 @@ TIM_HandleTypeDef htim16;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+
+//variable tmp
+uint8_t sonnar_mesure_done = 1; //empêche de relancer le timer7
+
+//varible sonar
+uint8_t flag_timer_sonar = 0;
+double value_distance = 0;
+uint16_t value_echo = 0;
 
 /* USER CODE END PV */
 
@@ -105,8 +116,11 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  uart_init(&huart1);
   motors_init(&htim3, &htim16);
-  sensors_init(&htim7,&htim6);
+
+  HAL_TIM_Base_Init(&htim7);
+  HAL_TIM_Base_Init(&htim6);
 
   /* USER CODE END 2 */
 
@@ -115,12 +129,38 @@ int main(void)
    // TODO code here
   while (1)
   {
+	  	if(sonnar_mesure_done)
+	  	{
+	  		HAL_Delay(10);
+	  		 HAL_TIM_Base_Start_IT(&htim7);
+	  		 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+	  		sonnar_mesure_done = 0;
+	  	}
+	  	if (flag_timer_sonar)
+	  	{
+	  		//Calcul apres reception signal :
+	  		//value_distance = value_echo * 0.17;  //distance en mm
+	  		flag_timer_sonar = 0;
+	  		sonnar_mesure_done = 1;
+
+
+		  	if (value_echo < 300)
+		  	{
+		  		 flags.vObstable = 1;
+		  	}
+		  	else
+		  	{
+		  		flags.vObstable = 0;
+		  	}
+	  	}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-	  state_machine_run();
+	  utils_readAndSaveDir();
 
+	  state_machine_run();
   }
   /* USER CODE END 3 */
 }
@@ -218,7 +258,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 400;
+  sConfigOC.Pulse = SPEED;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
@@ -250,7 +290,7 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 0;
+  htim6.Init.Prescaler = 99;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 65535;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -288,7 +328,7 @@ static void MX_TIM7_Init(void)
 
   /* USER CODE END TIM7_Init 1 */
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 0;
+  htim7.Init.Prescaler = 39;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim7.Init.Period = 10;
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -342,7 +382,7 @@ static void MX_TIM16_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 400;
+  sConfigOC.Pulse = SPEED;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -474,6 +514,61 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+	if(GPIO_Pin == GPIO_PIN_1)
+	{
+		if ( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1))
+		{
+			HAL_TIM_Base_Start(&htim6);
+			value_echo = __HAL_TIM_GET_COUNTER(&htim6);
+		}
+		else
+		{
+			HAL_TIM_Base_Stop(&htim6);
+			value_echo = __HAL_TIM_GET_COUNTER(&htim6) - value_echo;
+			flag_timer_sonar = 1 ;
+		}
+	}
+
+
+	if(GPIO_Pin == GPIO_PIN_13) // Button
+		{
+			flags.fButton = 1;
+		}
+
+	if(GPIO_Pin == GPIO_PIN_12) // Capteur droit
+	{
+		flags.fSensorRight = 1;
+		flags.vSensorRight = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
+	}
+
+	if(GPIO_Pin == GPIO_PIN_14) // Capteur gauche
+	{
+		flags.fSensorLeft = 1;
+		flags.vSensorLeft = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
+	}
+
+	if(GPIO_Pin == GPIO_PIN_15) // Capteur balle
+	{
+		flags.fSensorBall = 1;
+		flags.vSensorBall = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15);
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+	HAL_TIM_Base_Stop_IT(&htim7);
+	HAL_TIM_Base_Init(&htim7);
+
+}
+
+
 
 /* USER CODE END 4 */
 

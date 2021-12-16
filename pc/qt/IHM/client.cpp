@@ -699,6 +699,7 @@ void Client::bp_co_clicked()
 
     //connect(m_client,SIGNAL(connected()),this,SLOT(setsub())); //active les subs
     qDebug() << m_client->state();
+
     if (m_client->state() == QMqttClient::Disconnected)
     {
         ui->le_host->setEnabled(false);
