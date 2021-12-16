@@ -5,7 +5,7 @@
 
 namespace uart {
 
-    const char separator = '-';
+    const char separator = '\n';
     const uint16_t buffer_size = 1000;
     char buffer[buffer_size] = {0};
     uint16_t buffer_i = 0;
@@ -72,6 +72,14 @@ namespace uart {
         }
 
         return "";
+    }
+
+    /**
+     * @brief Envoie toutes les données, reçues sur Rx, sur Tx
+     * 
+     */
+    void echo() {
+        Serial.print(Serial.readString());
     }
 
 }

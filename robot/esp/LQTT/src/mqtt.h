@@ -10,6 +10,9 @@
 
 namespace mqtt {
 
+    // Robot
+    //String robot_id = "ROBOT5";
+
     // WiFi Connection configuration
     char wifi_ssid[] = "IMERIR_IoT";     //  le nom du reseau WIFI : IMERIR_IoT, HUAWEI P Qandre
     char wifi_password[] = "kohWoong5oox";  // le mot de passe WIFI : kohWoong5oox, qandre211198
@@ -17,7 +20,7 @@ namespace mqtt {
     // MQTT server properties
     char mqtt_server[] = "mqtt-milles.imerir.org"; //adresse IP serveur
     uint16_t mqtt_port = 1884;
-    String mqtt_id = "robot5";
+    String mqtt_id = "robot5-zrcgdrthvygun";
     String mqtt_user = "terrain2";
     String mqtt_password = "56jpwYhr";
 
@@ -27,12 +30,12 @@ namespace mqtt {
 
     void init();
     void callback(char* topic, byte* payload, unsigned int length);
-    void test();
+    void send(String message);
     void loop();
 
     void init() {
 
-        // Serial.println("Post WiFi");
+        //Serial.println("Post WiFi");
 
         // Connecte le WiFi
         WiFi.mode(WIFI_OFF);    //Empêcher les problèdes de reconnexion
@@ -48,21 +51,19 @@ namespace mqtt {
             delay(400);
         }
 
-        Serial.print("WiFi set : ");
-        IPAddress addr = WiFi.localIP();
-        Serial.println(addr.toString());
-        Serial.println(WiFi.subnetMask());
-        Serial.print("MAC Address : ");
-        Serial.println(WiFi.macAddress());
+        //Serial.print("WiFi set : ");
+        //IPAddress addr = WiFi.localIP();
+        //Serial.println(addr.toString());
+        //Serial.println(WiFi.subnetMask());
+        //Serial.print("MAC Address : ");
+        //Serial.println(WiFi.macAddress());
 
         // Connecte le serveur()
-        Serial.print(mqtt_server); Serial.print(":");Serial.println(mqtt_port);
-        MQTTclient.setKeepAlive(true);
+        //Serial.print(mqtt_server); Serial.print(":");Serial.println(mqtt_port);
         MQTTclient.setServer(mqtt_server, mqtt_port);
         MQTTclient.setCallback(mqtt::callback);
+        //MQTTclient.setSocketTimeout(10000);
         while(!MQTTclient.connected()) {
-
-            Serial.println(MQTTclient.state());
 
             if(!MQTTclient.connect(mqtt_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str())) {
                 
@@ -72,13 +73,15 @@ namespace mqtt {
                 delay(100);
             }
 
+            //Serial.println(MQTTclient.state());
+
         }
 
         digitalWrite(D0, HIGH);
         
-        // Serial.println("MQTT set");
+        //Serial.println("MQTT set");
 
-        MQTTclient.subscribe("#");
+        MQTTclient.subscribe("field/robot/ROBOT5/path");
 
     }
 
@@ -93,16 +96,23 @@ namespace mqtt {
         Serial.print(topic);
         Serial.print(" ");
 
+        digitalWrite(D0, LOW);
+        delay(100);
+        digitalWrite(D0, HIGH);
+        delay(100);
+        digitalWrite(D0, LOW);
+
         payload[length] = '\0';
         String s = String((char*)payload);
 
-        Serial.println(s);
-        Serial.println();
+        Serial.print(s + "\n\n");
     }
 
     void send(String message) {
 
-        //if(MQTTclient.connected()) {
+        Serial.println(MQTTclient.state());
+
+        if(MQTTclient.connected()) {
 
             Serial.println("mqtt::send");
 
@@ -115,19 +125,17 @@ namespace mqtt {
             strncpy(content, c_message +i +1, j -i -3);
 
             // Serial.println(message);
-            Serial.println("." + String(topic) + ".");
-            Serial.println("." + String(content) + ".");
+            //Serial.println("." + String(topic) + ".");
+            //Serial.println("." + String(content) + ".");
             Serial.println(MQTTclient.publish(topic, content));
-        //}
+        }
     }
 
     void loop() {
 
-        Serial.println("mqtt::loop");
-
         MQTTclient.loop();
-    }
 
+    }
 }
 
 #endif
