@@ -22,7 +22,7 @@ QMap<int,QString> pazc3;// chemin zone de chargement 3
 QMap<int,QString> pazrd; // chemin retour depot
 QMap<int,QString> pazrcr; // chemin retour zone de chargement precedent
 
-QStringList listorder;//fake attention mais lite de nos ordres
+QStringList listorder;//liste de nos ordres
 
 
 QString colorballtargeted; //couleur de la balle ciblé
@@ -82,7 +82,8 @@ Client::Client(QWidget *parent)
     , ui(new Ui::Client)
 {
     ui->setupUi(this);
-
+    this->setWindowTitle("AMAZËN (by LQTT) ®");
+    this->setWindowIcon(QIcon("C:/Users/Laurent/Downloads/amazenpro.png"));
     //id de notre zone de depart --> zone de depot 1
     id=12;
     //mise en place des deplacement a effectuer en fonctions de l'id
@@ -120,18 +121,22 @@ Client::Client(QWidget *parent)
     connect(this->ui->pb_order, SIGNAL(clicked()),this, SLOT(jsonMessageOrder()));
 
     // initialisation de l'affichage des étagères a Rien (blanc)
-    coletagere.insert(1,"NoA");
-    coletagere.insert(2,"NoA");
-    coletagere.insert(3,"NoA");
-    coletagere.insert(4,"NoA");
+    coletagere.insert(1,"");
+    coletagere.insert(2,"");
+    coletagere.insert(3,"");
+    coletagere.insert(4,"");
 
 
-    connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
-    connect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
+    //connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
+    //connect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
 
 
     //recuperation des infos sur les etageres
     updatestatusetagere();
+
+
+
+
 
 }
 
@@ -175,13 +180,17 @@ void Client::jsonMessageOrder()
     if (listorder.isEmpty())
     {
         receptz = ui->sb_zdc->value();
-        qDebug()<<receptz;
+        qDebug()<< "if de path et val de receptz "<<receptz;
         colorballtargeted = ui->cb_color->currentText();
+        qDebug()<< "zone de chargement dans le if "<<ui->sb_zdc->text();
+        qDebug()<< "couleur dans le if "<<ui->cb_color->currentText();
+
     }
     //ajout des ordres dans la liste
     listorder.append(ui->sb_zdc->text()+","+ui->cb_color->currentText());
     ui->lcdNumber->display(listorder.size());
-    qDebug() << listorder;
+    ui->te_listeorder->append("Zone de Chargement: "+ui->sb_zdc->text()+" , couleur ciblée: "+ui->cb_color->currentText());
+
 }
 
 
@@ -193,6 +202,8 @@ int Client::jsonMessagePath(int id)
 {
     qDebug() << "valeur de receptz pour JSONMessagePath "<< receptz;
     int id2=id;
+
+    //preparatioin de la trame
     QJsonObject envoie;
     QString topic;
     topic = "field/robot/ROBOT5/path";
@@ -200,33 +211,36 @@ int Client::jsonMessagePath(int id)
     qos=2;
     bool retain;
     retain = false;
-    if (id<8)
+
+
+    if (id<8) //cas ou la boucle du terrain n'est pas fini
     {
        finishloop=false;
     }
 
-    if(id<receptz)
+
+    if(id<receptz) //cas ou mon id est inferieur a ma zone de reception
     {
         id++;
         pazr.value(id);
-
         //publish id et sa value
         envoie.insert("id",id);
         envoie.insert("direction", pazr.value(id));
 
     }
-    else if(id==receptz)
+    else if(id==receptz) //on est arrivé au bon endroit
     {
-        //ne rien faire on est au bonne endroit
+        //ne rien faire on est au bon endroit
 
     }
+    //id qui ce situe soit en zone de reception soit interssection
     else if (id<9)
     {
         if(id<4)
         {
             id=4;
         }
-        if(receptz==1)
+        if(receptz==1)  //zone de recept 1
         {
             if (id==8)
             {
@@ -242,7 +256,7 @@ int Client::jsonMessagePath(int id)
                 envoie.insert("direction", pazc1.value(id));
             }
         }
-        if(receptz==2)
+        if(receptz==2) //zone de recept 2
         {
             if (id==8)
             {
@@ -259,7 +273,7 @@ int Client::jsonMessagePath(int id)
 
             }
         }
-        if(receptz==3)
+        if(receptz==3) //zone de recept 3
         {
             if (id==7)
             {
@@ -275,7 +289,7 @@ int Client::jsonMessagePath(int id)
                 envoie.insert("direction", pazc2.value(id));
             }
         }
-        if(receptz==4)
+        if(receptz==4)  //zone de recept 4
         {
             if (id==6)
             {
@@ -296,12 +310,12 @@ int Client::jsonMessagePath(int id)
     {
         if(id<8)
         {
-                id=8;//avant7
+                id=8;//avantmodif id=7
         }
         if(colok==true)
         {
             id++;
-            qDebug()<<"testaa";
+            qDebug()<<"boucle true et color true ";
             qDebug()<<id;
             pazrd.value(id);
             envoie.insert("id",id);
@@ -316,7 +330,7 @@ int Client::jsonMessagePath(int id)
                 id=1;
                 if(ballonbot==false)
                 {
-                    checketagere();
+                    checketagere(); //cherche la couleur dans les étageres
                 }
                 envoie.insert("id",id);
                 envoie.insert("direction", pazrcr.value(id));
@@ -338,13 +352,13 @@ int Client::jsonMessagePath(int id)
         qDebug()<<"zzzz";
         if(id2!=receptz){
             qDebug()<<"ggg";
-            this->emissionJson(envoie,topic,qos,retain);
+            this->emissionJson(envoie,topic,qos,retain); //envoie
         }
         return id;
     }
     else
     {
-        return 12;
+        return 12; //zone de départ
     }
 }
 
@@ -456,75 +470,85 @@ void Client::checketagere()
  */
 void Client::setsub()
 {
-/*
+    //envoie des color present dans les etageres
     QJsonObject envoie;
     QString topic;
+
+    //zone de chargement 1
     int zoneDeChargement = 1;
     QString zdc = QString::number(zoneDeChargement);
-    topic = "field/loading_area/"+ zdc +"/color";    // verifier le topic =========//
+    topic = "field/loading_area/"+ zdc +"/color";
     quint8 qos;
     qos=0;
     bool retain;
     retain = true;
-    envoie.insert("color","NoA");
+    envoie.insert("color","");
     this->emissionJson(envoie,topic,qos,retain);
 
-     zoneDeChargement = 2;
+    //zone de chargement 2
+    zoneDeChargement = 2;
     zdc = QString::number(zoneDeChargement);
-    topic = "field/loading_area/"+ zdc +"/color";    // verifier le topic =========//
-
+    topic = "field/loading_area/"+ zdc +"/color";
     qos=0;
     retain = true;
-    envoie.insert("color","NoA");
+    envoie.insert("color","");
     this->emissionJson(envoie,topic,qos,retain);
+
+    //zone de chargement 3
     zoneDeChargement = 3;
-   zdc = QString::number(zoneDeChargement);
-   topic = "field/loading_area/"+ zdc +"/color";    // verifier le topic =========//
+    zdc = QString::number(zoneDeChargement);
+    topic = "field/loading_area/"+ zdc +"/color";
+    qos=0;
+    retain = true;
+    envoie.insert("color","");
+    this->emissionJson(envoie,topic,qos,retain);
 
-   qos=0;
-   retain = true;
-   envoie.insert("color","NoA");
-   this->emissionJson(envoie,topic,qos,retain);
-   zoneDeChargement = 4;
-  zdc = QString::number(zoneDeChargement);
-  topic = "field/loading_area/"+ zdc +"/color";    // verifier le topic =========//
+    //zone de chargement 4
+    zoneDeChargement = 4;
+    zdc = QString::number(zoneDeChargement);
+    topic = "field/loading_area/"+ zdc +"/color";
+    qos=0;
+    retain = true;
+    envoie.insert("color","");
+    this->emissionJson(envoie,topic,qos,retain);
 
-  qos=0;
-  retain = true;
-  envoie.insert("color","NoA");
-  this->emissionJson(envoie,topic,qos,retain);
-
-*/
+    // abonnements camera pour couleur
     QString sub="field/camera/5/color";
     subscription = m_client->subscribe(sub,1);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceivedCam(QMqttMessage)));
 
+    // abonnements ROBOT5n pour status
     sub="field/robot/ROBOT5/status";
     subscription = m_client->subscribe(sub,1);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceivedRobStatus(QMqttMessage)));
 
+    // abonnements ROBOT5n pour button
     sub="field/robot/ROBOT5/button";
     subscription = m_client->subscribe(sub,2);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceivedRobButton(QMqttMessage)));
 
+    // abonnements pour connaitre couleur etagere 1
     sub="field/loading_area/1/color";
     subscription = m_client->subscribe(sub,0);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceiveEtagere1(QMqttMessage)));
 
+    // abonnements pour connaitre couleur etagere 2
     sub="field/loading_area/2/color";
     subscription = m_client->subscribe(sub,0);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceiveEtagere2(QMqttMessage)));
 
+    // abonnements pour connaitre couleur etagere 3
     sub="field/loading_area/3/color";
     subscription = m_client->subscribe(sub,0);
     qDebug()<<subscription;
     connect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceiveEtagere3(QMqttMessage)));
 
+    // abonnements pour connaitre couleur etagere 4
     sub="field/loading_area/4/color";
     subscription = m_client->subscribe(sub,0);
     qDebug()<<subscription;
@@ -577,18 +601,26 @@ void Client::messReceivedRobStatus(QMqttMessage msg)
 
     id=jsonMessagePath(response.toInt()); // recuperation de la valeur de l'id du chemin
 
-    if (id==12){ //penser au bouton
+    if (id==12)
+    {
          listorder.removeFirst();
          ui->lcdNumber->display(listorder.size());
-        if(!listorder.isEmpty()){
+
+         //suppression du premiere ordre du QTextEdit te_listeorder
+         QTextCursor cursor = ui->te_listeorder->textCursor();
+         cursor.movePosition(QTextCursor::Start);
+         cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, 0);
+         cursor.select(QTextCursor::LineUnderCursor);
+         cursor.removeSelectedText();
+         cursor.deleteChar(); //suppression de l'element
+
+        if(!listorder.isEmpty())
+        {
             receptz=listorder.at(0).split(",")[0][0].digitValue();
             colorballtargeted=listorder.at(0).split(",")[1][0];
             qDebug()<<id;
-
-
         }
     }
-
 }
 
 /**Message recu du robot indiquant le status du boutton la stm32
@@ -648,7 +680,7 @@ void Client::messReceivedRobButton(QMqttMessage msg)
     }
 }
 
-/**Message recu par etagere1
+/**Message recu par etagere1 et mis a jour de la couleur etagere
  * @brief Client::messReceiveEtagere1
  * @param msg
  */
@@ -662,7 +694,7 @@ void Client::messReceiveEtagere1(QMqttMessage msg)
     updatestatusetagere();
 }
 
-/**Message recu par etagere2
+/**Message recu par etagere2 et mis a jour de la couleur etagere
  * @brief Client::messReceiveEtagere2
  * @param msg
  */
@@ -676,7 +708,7 @@ void Client::messReceiveEtagere2(QMqttMessage msg)
     updatestatusetagere();
 }
 
-/**Message recu par etagere3
+/**Message recu par etagere3 et mis a jour de la couleur etagere
  * @brief Client::messReceiveEtagere3
  * @param msg
  */
@@ -690,7 +722,7 @@ void Client::messReceiveEtagere3(QMqttMessage msg)
     updatestatusetagere();
 }
 
-/**Message recu par etagere4
+/**Message recu par etagere4 et mis a jour de la couleur etagere
  * @brief Client::messReceiveEtagere4
  * @param msg
  */
@@ -763,6 +795,7 @@ void Client::updatestatusetagere()
         ui->te_etage1->setStyleSheet("QTextEdit { background-color: rgb(255, 255, 0); }");
     }
 
+
     // couleur etagere 2
     if(coletagere.value(2)=="red")
     {
@@ -816,13 +849,11 @@ void Client::updatestatusetagere()
     {
         ui->te_etage4->setStyleSheet("QTextEdit { background-color: rgb(255, 255, 0); }");
     }
-
-   // ui->label_3->setText(coletagere.value(1));
-    //ui->label_4->setText(coletagere.value(2));
-    //ui->label_7->setText(coletagere.value(3));
-    //ui->label_8->setText(coletagere.value(4));
 }
 
+/**pour le bouton disconnect
+ * @brief Client::setdiscon
+ */
 void Client::setdiscon()
 {
     ui->le_host->setEnabled(true);
@@ -836,6 +867,9 @@ void Client::setdiscon()
     connect(m_client,SIGNAL(disconnected()),this,SLOT(dissub())); //active les subs
 }
 
+/**quand deconnexion clicked() desinscription
+ * @brief Client::dissub
+ */
 void Client::dissub()
 {
     QString sub="field/camera/5/color";
@@ -867,6 +901,10 @@ void Client::dissub()
     disconnect(subscription,SIGNAL(messageReceived(QMqttMessage)),this,SLOT(messReceiveEtagere4(QMqttMessage)));
 }
 
+/** check spin pour changer comboBox
+ * @brief Client::checkexspin
+ * @param spinindex
+ */
 void Client::checkexspin(int spinindex)
 {
     disconnect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
@@ -875,7 +913,8 @@ void Client::checkexspin(int spinindex)
     int newint;
     getval=coletagere.value(spinindex);
     qDebug()<<getval;
-    if (getval!="NoA"){
+
+    if (getval!=""){
        newint= ui->cb_color->findText(getval);
 
        ui->cb_color->setCurrentIndex(newint);
@@ -884,6 +923,10 @@ void Client::checkexspin(int spinindex)
 
 }
 
+/**check combo pour changer spinbox
+ * @brief Client::checkexcombo
+ * @param comboval
+ */
 void Client::checkexcombo(int comboval)
 {
     disconnect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
@@ -901,20 +944,3 @@ void Client::checkexcombo(int comboval)
 
 }
 
-
-
-
-
-/*
-void Client::on_simuSTM_clicked()
-{
-    if(ballonbot)
-    {
-    m_client->publish
-    }
-    else
-    {
-
-    }
-}
-*/
