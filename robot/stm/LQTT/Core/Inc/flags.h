@@ -15,15 +15,15 @@ union {
 		unsigned fOrderRight :1;
 		unsigned fOrderForward :1;
 
-		unsigned fSensorLeft :1;
 		unsigned vSensorLeft :1;
-		unsigned fSensorRight :1;
+		unsigned fSensorLeft :1;
 		unsigned vSensorRight :1;
-		unsigned fSensorBall :1;
+		unsigned fSensorRight :1;
 		unsigned vSensorBall :1;
+		unsigned fSensorBall :1;
 
-		unsigned fObstacle :1;
 		unsigned vObstable :1;
+		unsigned fObstacle :1;
 		unsigned fButton :1;
 
 		unsigned :4;
