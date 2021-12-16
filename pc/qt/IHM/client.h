@@ -14,6 +14,7 @@
 #include <QObject>
 #include <QArrayData>
 #include<QByteArray>
+#include <QPicture>
 
 
 QT_BEGIN_NAMESPACE
@@ -56,7 +57,7 @@ public slots:
     void setdiscon();
     void dissub();
     void checkexspin(int);
-    void checkexcombo(int);
+
 
 
 };
