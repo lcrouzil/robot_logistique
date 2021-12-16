@@ -1,4 +1,4 @@
-#IHM Client
+# IHM Client
 Le langage de programmation est c++ avec Qt en framework./
 Cette partie du projet nous permet d'offrir un interface homme machine à notre client.
 
