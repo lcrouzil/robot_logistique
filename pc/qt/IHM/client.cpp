@@ -868,7 +868,7 @@ void Client::dissub()
  */
 void Client::checkexspin(int spinindex)
 {
-    disconnect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
+
 
     QString getval;
     int newint;
@@ -880,6 +880,6 @@ void Client::checkexspin(int spinindex)
 
        ui->cb_color->setCurrentIndex(newint);
     }
-    connect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
+
 
 }
