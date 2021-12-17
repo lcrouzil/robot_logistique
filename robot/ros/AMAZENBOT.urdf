@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+<!--<sdf version="1.5"> -->
+
+<robot name="AMAZENBOT">
+
+	<link name="base_link_1">
+		<visual>
+			<geometry>
+				<box size="0.5 1 0.02"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0.15"/>
+			<material name="lgreyi">
+				<color rgba="0.7 0.7 0.7 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	
+	<link name="base_link_2">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.25" length="0.02"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0.5 0.15"/>
+			<material name="lgreyi">
+				<color rgba="0.7 0.7 0.7 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="fixation_roue_chassis">
+		<visual>
+			<geometry>
+				<box size="0.1 0.1 0.05"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 -0.4 0.125"/>
+			<material name="greyi">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="fixation_roue_chassis_2">
+		<visual>
+			<geometry>
+				<box size="0.05 0.05 0.1"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="greyi">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="roue_folle">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.05" length="0.04"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="white">
+				<color rgba="1 1 1 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="roue_droite">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.12" length="0.1"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blacky">
+				<color rgba="0.2 0.2 0.2 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="roue_gauche">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.12" length="0.1"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blacky">
+				<color rgba="0.2 0.2 0.2 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="stm32">
+		<visual>
+			<geometry>
+				<box size="0.3 0.4 0.03"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 -0.25 0.175"/>
+			<material name="white">
+				<color rgba="1 1 1 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	<link name="esp_and_shield">
+		<visual>
+			<geometry>
+				<box size="0.2 0.3 0.04"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 -0.25 0.185"/>
+			<material name="blacky">
+				<color rgba="0.2 0.2 0.2 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	<link name="sonar_board">
+		<visual>
+			<geometry>
+				<box size="0.2 0.005 0.08"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0.70 0.20"/>
+			<material name="bluey">
+				<color rgba="0.2 0.3 0.8 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	<link name="sonar_reciepter">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.0255" length="0.028"/>
+			</geometry>
+			<origin rpy="1.5 0 0" xyz="0.05 0.72 0.20"/>
+			<material name="greyi">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+	</link>
+	<link name="sonar_reciever">
+		<visual>
+			<geometry>
+				 <cylinder radius="0.0255" length="0.028"/>
+			</geometry>
+			<origin rpy="1.5 0 0" xyz="-0.05 0.72 0.20"/>
+			<material name="greyi">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+	</link>
+	
+	<link name="line_detect_1_board">
+		<visual>
+			<geometry>
+				<box size="0.08 0.2 0.005"/>
+			</geometry>
+			<origin rpy="0 0 2.7" xyz="0.25 0.60 0.135"/>
+			<material name="bluey">
+				<color rgba="0.2 0.3 0.8 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	<link name="line_detect_2_board">
+		<visual>
+			<geometry>
+				<box size="0.08 0.2 0.005"/>
+			</geometry>
+			<origin rpy="0 0 0.7" xyz="-0.25 0.60 0.135"/>
+			<material name="bluey">
+				<color rgba="0.2 0.3 0.8 1.0"/>
+			</material>
+
+		</visual>
+	</link>
+	<joint name="fusionBase" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="base_link_2"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+
+	<joint name="attacheRoueFolle" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="fixation_roue_chassis"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="controlRoueFolle" type="revolute">
+		<parent link="fixation_roue_chassis"/>
+		<child link="fixation_roue_chassis_2"/>
+		<origin rpy="0 0 0" xyz="0 -0.4 0.100"/>
+		<pose rpy="0 0 0" xyz="0 0 -0.025"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-3.14" upper="3.14" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="rotationRoueFolle" type="revolute">
+		<parent link="fixation_roue_chassis_2"/>
+		<child link="roue_folle"/>
+		<origin rpy="0 1.556 0" xyz="0 0 -0.05"/>
+		<pose rpy="0 0 0" xyz="0 0 -0.025"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-3.14" upper="3.14" effort="0.1" velocity="1"/>
+	</joint>
+		<joint name="RotationRoueDroite" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="roue_droite"/>
+		<origin rpy="0 1.556 0"  xyz="0.31 0.3 0.104"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-3.14" upper="3.14" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="RotationRoueGauche" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="roue_gauche"/>
+		<origin rpy="0 1.556 0"  xyz="-0.31 0.3 0.104"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-3.14" upper="3.14" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachStm" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="stm32"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachEsp" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="esp_and_shield"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachSonarboard" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="sonar_board"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachSonarreceipt" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="sonar_reciepter"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachSonarreceiver" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="sonar_reciever"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachLineDetect1" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="line_detect_1_board"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+	<joint name="attachLineDetect2" type="revolute">
+		<parent link="base_link_1"/>
+		<child link="line_detect_2_board"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<pose rpy="0 0 0" xyz="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="0" upper="0" effort="0.1" velocity="1"/>
+	</joint>
+
+
+</robot>
+<!--</sdf> -->
