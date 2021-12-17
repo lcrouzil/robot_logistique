@@ -7,7 +7,7 @@
 
 #include "direction.h"
 
-#define MAX 10
+#define MAX 100
 
 Direction_t m_array[MAX]; // Tableau circulaire de direction à prendre
 uint8_t m_i = 0; // Emplacement de la première direction [0; max[
@@ -38,7 +38,7 @@ uint8_t direction_get(Direction_t* dir) {
 
 	if(!direction_empty()) {
 		Direction_t dirTmp = m_array[m_i];
-		m_i++;
+		m_i = (m_i +1) %MAX;
 		m_n--;
 
 		dir->dir = dirTmp.dir;

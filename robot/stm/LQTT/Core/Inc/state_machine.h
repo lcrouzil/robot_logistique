@@ -67,8 +67,7 @@ void state_machine_run() {
 			stateOld = state;
 		}
 
-		if(flags.obstacle == 0b10) { // flag levé & pas d'obstacle
-			flags.fObstacle = 0;
+		if(!flags.vObstacle) { // flag levé & pas d'obstacle
 			state = S_MOVE_FORWARD;
 			break;
 		}
@@ -86,6 +85,10 @@ void state_machine_run() {
 			stateOld = state;
 		}
 
+		if(flags.vObstacle) {
+			state = S_MOVE_STOP;
+			break;
+		}
 		if(!flags.vSensorLeft) { // flag levé & piste noir
 			state = S_MOVE_LEFT;
 			break;
@@ -108,6 +111,10 @@ void state_machine_run() {
 			stateOld = state;
 		}
 
+		if(flags.vObstacle) {
+			state = S_MOVE_STOP;
+			break;
+		}
 		if(!flags.vSensorLeft) {  // flag levé & piste noir
 			state = S_INTERSECTION;//S_INTERSECTION;
 			break;
@@ -130,6 +137,10 @@ void state_machine_run() {
 			stateOld = state;
 		}
 
+		if(flags.vObstacle) {
+			state = S_MOVE_STOP;
+			break;
+		}
 		if(flags.vSensorLeft) {  // flag levé & piste blanche
 			state = S_MOVE_FORWARD;
 			break;

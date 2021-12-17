@@ -22,7 +22,7 @@ union {
 		unsigned vSensorBall :1;
 		unsigned fSensorBall :1;
 
-		unsigned vObstable :1;
+		unsigned vObstacle :1;
 		unsigned fObstacle :1;
 		unsigned fButton :1;
 
