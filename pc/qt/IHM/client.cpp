@@ -96,6 +96,10 @@ Client::Client(QWidget *parent)
     //jeu avec la spinbox
     connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
 
+    //grise le bouton cam
+    ui->pushButton->setEnabled(false);
+
+
 
 
     //recuperation des infos sur les etageres
@@ -705,6 +709,7 @@ void Client::bp_co_clicked()
         ui->le_host->setEnabled(false);
         ui->sb_port->setEnabled(false);
         ui->pb_co->setText(tr("Déconnexion"));
+        ui->pushButton->setEnabled(true);
         m_client->connectToHost();
         qDebug() << "dasn le if" << m_client->state();
         m_client->setState(QMqttClient::Connecting);
@@ -809,6 +814,7 @@ void Client::setdiscon()
     ui->te_listeorder->clear();
     listorder.clear();
     ui->lcdNumber->display(0);
+    ui->pushButton->setEnabled(false);
 
     // reset de l'affichage des étagères a Rien (blanc)
     coletagere.insert(1,"");
