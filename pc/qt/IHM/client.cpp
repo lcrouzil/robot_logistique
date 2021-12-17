@@ -32,42 +32,6 @@ bool colok;    //bonne couleur
 bool finishloop=false;// boucle non terminé (algo)
 bool ballonbot; // balle sur le robot
 
-//*******************************************************************************************************************
-//          FONCTIONS                                                                                              *
-//*******************************************************************************************************************
-
-/**verification de la cible dans l'etagere
- * si ball non trouver incrementationd de receptz (zone de reception)
- * @brief checketagere
- */
-
-/*
-void checketagere()
-{
-    bool ballfound=false;
-    qDebug()<<colorballtargeted;
-
-    if(coletagere.value(1)==colorballtargeted){
-            ballfound=true;
-            receptz=1;
-     }else if(coletagere.value(2)==colorballtargeted){
-            ballfound=true;
-            receptz=2;
-     }else if(coletagere.value(3)==colorballtargeted){
-        ballfound=true;
-        receptz=3;
-     }else if(coletagere.value(4)==colorballtargeted){
-        ballfound=true;
-        receptz=4;
-
-    }
-
-    if(ballfound==false){
-        receptz=receptz%4;
-        receptz++;
-    }
-}
-*/
 
 //*******************************************************************************************************************
 //          CONSTRUCTEUR                                                                                              *
@@ -129,9 +93,9 @@ Client::Client(QWidget *parent)
     coletagere.insert(3,"");
     coletagere.insert(4,"");
 
+    //jeu avec la spinbox
+    connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
 
-    //connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
-    //connect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
 
 
     //recuperation des infos sur les etageres
@@ -181,8 +145,7 @@ void Client::jsonMessageOrder()
         receptz = ui->sb_zdc->value();
         qDebug()<< "if de path et val de receptz "<<receptz;
         colorballtargeted = ui->cb_color->currentText();
-        qDebug()<< "zone de chargement dans le if "<<ui->sb_zdc->text();
-        qDebug()<< "couleur dans le if "<<ui->cb_color->currentText();
+
 
     }
     //ajout des ordres dans la liste
@@ -209,7 +172,7 @@ int Client::jsonMessagePath(int id)
     quint8 qos;
     qos=2;
     bool retain;
-    retain = true; //============================================================false normalement
+    retain = false;
 
     if (id<8) //cas ou la boucle du terrain n'est pas fini
     {
@@ -240,7 +203,7 @@ int Client::jsonMessagePath(int id)
         }
         if(receptz==1)  //zone de recept 1
         {
-            if (id==8)
+            if (id==7)
             {
                     finishloop=true;
             }
@@ -273,7 +236,7 @@ int Client::jsonMessagePath(int id)
         }
         if(receptz==3) //zone de recept 3
         {
-            if (id==7)
+            if (id==8)
             {
                 finishloop=true;
             }
@@ -379,26 +342,6 @@ void Client::jsonMessageCam()
     this->emissionJson(envoie,topic,qos,retain);
 }
 
-/**Interface indique la couleur dans la zone determinee
- * @brief Client::jsonMessageAreaColor
- */
-/*
-void Client::jsonMessageAreaColor()
-{
-    QJsonObject envoie;
-    QString topic;
-    int zoneDeChargement = ui->sb_zdc->value();
-    QString zdc = QString::number(zoneDeChargement);
-    topic = "field/loading_area/"+ zdc +"/color";    // verifier le topic =========//
-    quint8 qos;
-    qos=0;
-    bool retain;
-    retain = true;
-    envoie.insert("color","color");
-    this->emissionJson(envoie,topic,qos,retain);/
-}
-*/
-
 /**Envoie du JSon
  * @brief Client::emissionJson
  * @param envoie
@@ -432,6 +375,9 @@ void Client::scan()
     m_client->publish(topic, jsString.toUtf8(),2);
 }
 
+/**check couleur des etageres
+ * @brief Client::checketagere
+ */
 void Client::checketagere()
 {
     bool ballfound=false;
@@ -860,6 +806,16 @@ void Client::setdiscon()
     ui->pb_co->setText(tr("Connexion"));
     ui->pb_order->setEnabled(false);
     m_client->disconnectFromHost();
+    ui->te_listeorder->clear();
+    listorder.clear();
+    ui->lcdNumber->display(0);
+
+    // reset de l'affichage des étagères a Rien (blanc)
+    coletagere.insert(1,"");
+    coletagere.insert(2,"");
+    coletagere.insert(3,"");
+    coletagere.insert(4,"");
+
     connect(this->ui->pb_co, SIGNAL(clicked()),this, SLOT(bp_co_clicked()));
     disconnect(this->ui->pb_co, SIGNAL(clicked()),this,SLOT(setdiscon())); //active les subs
     disconnect(m_client,SIGNAL(connected()),this,SLOT(setsub())); //active les subs
@@ -921,25 +877,3 @@ void Client::checkexspin(int spinindex)
     connect(ui->cb_color,SIGNAL(currentIndexChanged(int)),this,SLOT(checkexcombo(int)));
 
 }
-
-/**check combo pour changer spinbox
- * @brief Client::checkexcombo
- * @param comboval
- */
-void Client::checkexcombo(int comboval)
-{
-    disconnect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
-
-    QString getval;
-    int newint=0;
-    getval=ui->cb_color->currentText();
-   do{
-        newint++;
-    } while (newint<5 && coletagere.value(newint)!=getval);
-    if (newint!=5){
-       ui->sb_zdc->setValue(newint);
-    }
-    connect(ui->sb_zdc,SIGNAL(valueChanged(int)),this,SLOT(checkexspin(int)));
-
-}
-
